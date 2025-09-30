@@ -1,0 +1,150 @@
+:root {
+  --bg: #121213;
+  --fg: #d7dadc;
+  --tile: #3a3a3c;
+  --border: #3a3a3c;
+  --absent: #3a3a3c;
+  --present: #b59f3b;
+  --correct: #538d4e;
+  --key-bg: #818384;
+  --key-fg: #ffffff;
+}
+
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.topbar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2a2a2a;
+}
+.title { margin: 0; font-size: 22px; letter-spacing: 2px; }
+.btn {
+  background: #2d2d2f;
+  color: var(--fg);
+  border: 1px solid #3a3a3c;
+  padding: 8px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.btn:hover { filter: brightness(1.1); }
+
+.game { width: 100%; max-width: 600px; padding: 16px; }
+.board {
+  width: 100%;
+  display: grid;
+  gap: 6px;
+}
+.row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+.tile {
+  width: 100%;
+  aspect-ratio: 1 / 1; /* keep perfect square */
+  border: 2px solid var(--border);
+  background: transparent;
+  text-transform: uppercase;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+  color: var(--fg);
+  line-height: 1;
+}
+.tile { font-size: 26px; }
+.tile.flip { animation: flip 0.6s ease both; }
+.tile.correct { background: var(--correct); border-color: var(--correct); }
+.tile.present { background: var(--present); border-color: var(--present); }
+.tile.absent { background: var(--absent); border-color: var(--absent); }
+.tile.filled { border-color: #565758; }
+
+.keyboard { margin-top: 24px; user-select: none; }
+.kb-row { display: flex; justify-content: center; gap: 6px; margin-bottom: 8px; }
+.key {
+  background: var(--key-bg);
+  color: var(--key-fg);
+  border: none;
+  border-radius: 6px;
+  padding: 14px 10px;
+  min-width: 36px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.key.wide { min-width: 64px; padding: 14px 12px; }
+.key.correct { background: var(--correct); }
+.key.present { background: var(--present); }
+.key.absent { background: var(--absent); }
+
+.toast {
+  position: fixed;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 6px;
+  font-size: 14px;
+  opacity: 0.95;
+}
+
+.footer { margin: 24px 0 12px; text-align: center; font-size: 12px; color: #bdbdbd; }
+
+/* Animations */
+@keyframes shake {
+  10%, 90% { transform: translateX(-2px); }
+  20%, 80% { transform: translateX(4px); }
+  30%, 50%, 70% { transform: translateX(-8px); }
+  40%, 60% { transform: translateX(8px); }
+}
+.row.shake { animation: shake 0.6s; }
+
+/* Flip animation */
+@keyframes flip {
+  0% { transform: rotateX(0); }
+  50% { transform: rotateX(90deg); }
+  100% { transform: rotateX(0); }
+}
+
+/* Modal */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: grid;
+  place-items: center;
+}
+.modal {
+  background: #1c1c1f;
+  color: var(--fg);
+  width: min(92vw, 560px);
+  border-radius: 10px;
+  padding: 16px;
+  border: 1px solid #2a2a2a;
+}
+.modal h2 { margin: 4px 0 8px; }
+.modal h3 { margin: 16px 0 8px; font-size: 16px; }
+.stats-cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.stat-card { background: #222326; border: 1px solid #2f2f33; border-radius: 8px; padding: 10px; text-align: center; }
+.stat-card .num { font-size: 24px; font-weight: 700; }
+.stat-card .label { font-size: 12px; color: #bdbdbd; }
+.dist { display: grid; gap: 6px; }
+.dist-row { display: grid; grid-template-columns: 16px 1fr; gap: 10px; align-items: center; }
+.dist-label { font-size: 12px; color: #bdbdbd; }
+.dist-bar { background: #2b2b2f; border-radius: 4px; overflow: hidden; }
+.dist-fill { background: #4a6df3; color: #fff; font-weight: 700; font-size: 12px; padding: 4px 6px; min-width: 24px; text-align: right; }
+.modal-actions { display: flex; justify-content: flex-end; margin-top: 12px; }

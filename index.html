@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Vue Wordle Clone</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="topbar">
+        <h1 class="title">Word Vue</h1>
+        <div class="actions">
+          <button class="btn" @click="showStats = true">Stats</button>
+          <button class="btn" @click="newGame()">New Game</button>
+        </div>
+      </header>
+
+      <main class="game">
+        <div class="board">
+          <div class="row" v-for="(row, rIdx) in rows" :key="rIdx" :class="{shake: rIdx === shakeRow, revealing: rIdx === revealingRow}">
+            <div
+              class="tile"
+              v-for="(cell, cIdx) in row"
+              :key="cIdx"
+              :class="[cell.state, { flip: cell.flip }]"
+            >
+              {{ cell.letter }}
+            </div>
+          </div>
+        </div>
+
+        <div class="keyboard">
+          <div class="kb-row">
+            <button v-for="k in keyRows[0]" :key="k" class="key" :class="keyState[k]" @click="press(k)">{{ k }}</button>
+          </div>
+          <div class="kb-row">
+            <button v-for="k in keyRows[1]" :key="k" class="key" :class="keyState[k]" @click="press(k)">{{ k }}</button>
+          </div>
+          <div class="kb-row">
+            <button class="key wide" @click="press('ENTER')">Enter</button>
+            <button v-for="k in keyRows[2]" :key="k" class="key" :class="keyState[k]" @click="press(k)">{{ k }}</button>
+            <button class="key wide" @click="press('BACK')">⌫</button>
+          </div>
+        </div>
+      </main>
+
+      <div class="toast" v-if="message">{{ message }}</div>
+
+
+      <!-- Stats Modal -->
+      <div class="modal-backdrop" v-if="showStats" @click.self="showStats = false">
+        <div class="modal">
+          <h2>Statistics</h2>
+          <div class="stats-cards">
+            <div class="stat-card">
+              <div class="num">{{ stats.played }}</div>
+              <div class="label">Played</div>
+            </div>
+            <div class="stat-card">
+              <div class="num">{{ winRate }}</div>
+              <div class="label">Win %</div>
+            </div>
+            <div class="stat-card">
+              <div class="num">{{ stats.currentStreak }}</div>
+              <div class="label">Current Streak</div>
+            </div>
+            <div class="stat-card">
+              <div class="num">{{ stats.maxStreak }}</div>
+              <div class="label">Max Streak</div>
+            </div>
+          </div>
+
+          <h3>Guess Distribution</h3>
+          <div class="dist">
+            <div class="dist-row" v-for="(v, i) in stats.distribution" :key="i">
+              <div class="dist-label">{{ i + 1 }}</div>
+              <div class="dist-bar">
+                <div class="dist-fill" :style="{ width: distWidth(v) }">{{ v }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn" @click="showStats = false">Close</button>
+          </div>
+        </div>
+      </div>
+      <footer class="footer">
+        <p>Guess the 5-letter word. Unlimited plays. Built with Vue.</p>
+      </footer>
+    </div>
+
+    <!-- Vue 3 from CDN -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="words.js"></script>
+    <script src="app.js"></script>
+  </body>
+  </html>
