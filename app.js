@@ -42,8 +42,6 @@
 
   const app = createApp({
     data() {
-      const defaultAnswers = Array.isArray(window.ANSWER_WORDS) && window.ANSWER_WORDS.length ? window.ANSWER_WORDS.slice() : ["APPLE"];
-      const allowedBase = Array.isArray(window.ALLOWED_WORDS) && window.ALLOWED_WORDS.length ? window.ALLOWED_WORDS : defaultAnswers;
       return {
         rows: makeEmptyRows(),
         currentRow: 0,
@@ -68,30 +66,65 @@
           distribution: [0,0,0,0,0,0],
         },
         // dictionary
-        answerWords: defaultAnswers,
-        allowedWords: new Set(allowedBase),
+        answerWords: [],
+        allowedWords: new Set(),
+        dictionaryLoaded: false,
       };
     },
     mounted() {
       this.loadStats();
-      if (!this.answerWords.length) {
-        this.answerWords = ["APPLE"];
-      }
-      if (!this.allowedWords.size) {
-        this.allowedWords = new Set(this.answerWords);
-      }
-      this.newGame();
+      this.loadDictionary().finally(() => {
+        this.dictionaryLoaded = true;
+        if (!this.answerWords.length) {
+          this.answerWords = ["APPLE"];
+        }
+        if (!this.allowedWords.size) {
+          this.allowedWords = new Set(this.answerWords);
+        }
+        this.newGame();
+      });
       window.addEventListener("keydown", this.onKeydown);
     },
     beforeUnmount() {
       window.removeEventListener("keydown", this.onKeydown);
     },
     methods: {
+      async loadDictionary() {
+        const loadList = async (path) => {
+          try {
+            const res = await fetch(path, { cache: "no-store" });
+            if (!res.ok) return null;
+            const txt = await res.text();
+            return txt
+              .split(/\r?\n/)
+              .map(s => s.trim().toUpperCase())
+              .filter(s => /^[A-Z]{5}$/.test(s));
+          } catch (_) {
+            return null;
+          }
+        };
+
+        const answers = await loadList("dict/answers.txt");
+        const allowed = await loadList("dict/allowed.txt");
+
+        if (answers && answers.length) this.answerWords = answers;
+        if (allowed && allowed.length) {
+          this.allowedWords = new Set(allowed);
+        }
+        if (this.answerWords.length) {
+          if (!this.allowedWords.size) this.allowedWords = new Set(this.answerWords);
+          else this.answerWords.forEach(word => this.allowedWords.add(word));
+        }
+        if (!answers || !answers.length || !this.allowedWords.size) {
+          this.toast("Word lists not found; using fallback words.");
+        }
+      },
       randomAnswer() {
-        const list = this.answerWords && this.answerWords.length ? this.answerWords : (window.ANSWER_WORDS || ["APPLE"]);
+        const list = this.answerWords && this.answerWords.length ? this.answerWords : ["APPLE"];
         return list[Math.floor(Math.random() * list.length)];
       },
       newGame() {
+        if (!this.dictionaryLoaded && !this.answerWords.length) return;
         this.rows = makeEmptyRows();
         this.currentRow = 0;
         this.currentCol = 0;

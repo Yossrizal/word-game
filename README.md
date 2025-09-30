@@ -1,57 +1,71 @@
-# Word Vue — Wordle-like game (Vue 3, no build step)
+# Word Vue
 
-A simple Wordle-style game built with Vue 3 via CDN. Guess a five-letter English word. Unlimited replays — no daily lock.
+Modern Wordle-style word game powered by Vue 3 and plain HTML/CSS/JS. Guess the five-letter word, track your stats, and play as many rounds as you like with a refreshed, rounded UI.
 
-## Run
+## Highlights
 
-- Option 1: double-click `index.html` to open in your browser.
-- Option 2: serve the folder (recommended):
-  - Python: `python3 -m http.server 5173`
-  - Node (if installed): `npx serve .`
-  - Then open `http://localhost:5173`.
+- Vue 3 single-page app with flip animations and keyboard support
+- Unlimited games with instant “New Game”
+- Local statistics (played, win %, streaks, distribution)
+- Curated dark glassmorphism theme with accessible contrasts
+- Strict validation against a full 14 k+ Wordle dictionary loaded from text files
 
-## Play
+## Prerequisites
 
-- Type letters on your keyboard or click the on-screen keys.
-- Press Enter to submit, Backspace to delete.
-- Colors:
-  - Green = correct letter, correct spot.
-  - Yellow = letter exists, wrong spot.
-  - Gray = not in the word.
-- Click “New Game” anytime to play with a different random word.
+- Node.js 18+ (for running a static dev server via `npx`)
 
-## Customize
+## Run Locally
 
-- Larger dictionary: place text files (one word per line, English only, 5 letters, uppercase/lowercase fine) in `dict/`:
-  - `dict/answers.txt` — candidates for the secret word
-  - `dict/allowed.txt` — valid guesses (will be merged with answers)
-  The provided files already contain the full Wordle lists (≈14.8k entries). `words.js` is auto-generated from these files so the app works even when opened directly from disk.
+The app fetches dictionary files (`dict/*.txt`), so you must serve it from HTTP/HTTPS.
 
-- You can replace the included `dict/*.txt` with your own lists (one uppercase/lowercase word per line). After editing, regenerate `words.js` so the app picks up the changes:
+```bash
+# from repo root
+npx serve .
+# open the reported URL (default http://localhost:3000)
+```
 
-  ```sh
-  node - <<'NODE'
-  const fs = require('fs');
-  const read = f => fs.readFileSync(f,'utf8').split(/\r?\n/).map(s=>s.trim().toUpperCase()).filter(s=>/^[A-Z]{5}$/.test(s));
-  const answers = Array.from(new Set(read('dict/answers.txt')));
-  const allowed = new Set(read('dict/allowed.txt'));
-  for (const w of answers) allowed.add(w);
-  const chunk = (arr) => arr.reduce((lines, w, i) => {
-    if (i % 20 === 0) lines.push('  ' + JSON.stringify(w));
-    else lines[lines.length - 1] += ', ' + JSON.stringify(w);
-    return lines;
-  }, []).join('\n');
-  const out = `// Auto-generated from dict/answers.txt and dict/allowed.txt\n`
-    + `window.ANSWER_WORDS = [\n${chunk(answers)}\n];\n`
-    + `window.ALLOWED_WORDS = [\n${chunk([...allowed])}\n];\n`;
-  fs.writeFileSync('words.js', out);
-  NODE
-  ```
+> You can install the server globally (`npm install -g serve`) if you prefer.
 
-- Guesses are validated against the allowed list. With the bundled files you get the full Wordle dictionary by default.
+## Gameplay
+
+- Type on your keyboard or click the on-screen keys.
+- `Enter` submits, `Backspace` deletes.
+- Tile colors follow Wordle rules: green = exact match, yellow = letter exists elsewhere, dark = absent.
+- Click **New Game** anytime for a fresh word.
+
+## Dictionaries & Customisation
+
+Word lists live in the `dict/` folder:
+
+- `dict/answers.txt` — words the game chooses from
+- `dict/allowed.txt` — valid guesses (auto-merged with answers on load)
+
+Both files are bundled with the full Wordle dictionary (~14 855 entries). To use your own:
+
+1. Replace either/both files with your word lists (one 5-letter word per line; case-insensitive).
+2. Refresh the browser — the Vue app re-fetches the files on startup.
+
+If the files can’t be fetched (e.g. server misconfiguration), the app falls back to a tiny built-in list and shows a toast warning.
+
+## Statistics
+
+- Stored in `localStorage` under `word-vue:stats`.
+- Includes games played, win rate, current/max streak, and guess distribution.
+- Clearing browser storage (or using incognito) resets the stats.
+
+## Project Structure
+
+```
+index.html   # single page entry point
+style.css    # theme and layout
+app.js       # Vue 3 application logic
+dict/        # answer & guess dictionaries (text files)
+```
 
 ## Notes
 
-- No build tools needed; everything is plain HTML/CSS/JS.
-- Vue 3 is loaded from a CDN for simplicity.
-- Statistics are stored locally in `localStorage` under `word-vue:stats`.
+- No build step required; everything runs in the browser.
+- Network access is only needed for the Vue CDN and loading the local dictionary files.
+- Feel free to tweak the theme in `style.css` to match your brand or colour palette.
+
+Happy guessing!
