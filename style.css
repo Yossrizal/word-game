@@ -10,6 +10,8 @@
   --key-fg: #ffffff;
 }
 
+[v-cloak] { display: none; }
+
 * { box-sizing: border-box; }
 html, body { height: 100%; }
 body {
