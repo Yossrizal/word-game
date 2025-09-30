@@ -42,6 +42,8 @@
 
   const app = createApp({
     data() {
+      const defaultAnswers = Array.isArray(window.ANSWER_WORDS) && window.ANSWER_WORDS.length ? window.ANSWER_WORDS.slice() : ["APPLE"];
+      const allowedBase = Array.isArray(window.ALLOWED_WORDS) && window.ALLOWED_WORDS.length ? window.ALLOWED_WORDS : defaultAnswers;
       return {
         rows: makeEmptyRows(),
         currentRow: 0,
@@ -66,75 +68,30 @@
           distribution: [0,0,0,0,0,0],
         },
         // dictionary
-        answerWords: (window.ANSWER_WORDS || []).slice(),
-        allowedWords: new Set(window.ALLOWED_WORDS || []),
-        dictLoaded: false,
+        answerWords: defaultAnswers,
+        allowedWords: new Set(allowedBase),
       };
     },
     mounted() {
       this.loadStats();
-      // Load from localStorage first, then files, then bundled
-      this.loadDictionaryFromStorage();
-      this.loadDictionary().finally(() => {
-        this.dictLoaded = true;
-        this.newGame();
-      });
+      if (!this.answerWords.length) {
+        this.answerWords = ["APPLE"];
+      }
+      if (!this.allowedWords.size) {
+        this.allowedWords = new Set(this.answerWords);
+      }
+      this.newGame();
       window.addEventListener("keydown", this.onKeydown);
     },
     beforeUnmount() {
       window.removeEventListener("keydown", this.onKeydown);
     },
     methods: {
-      async loadDictionary() {
-        // Try to load from dict/*.txt if available; fall back to bundled words.js
-        const fetchTxt = async (path) => {
-          try {
-            const res = await fetch(path, { cache: "no-store" });
-            if (!res.ok) return null;
-            const txt = await res.text();
-            return txt
-              .split(/\r?\n/)
-              .map(s => s.trim().toUpperCase())
-              .filter(s => /^[A-Z]{5}$/.test(s));
-          } catch (_) { return null; }
-        };
-
-        const answers = await fetchTxt("dict/answers.txt");
-        const allowed = await fetchTxt("dict/allowed.txt");
-        if (answers && answers.length) this.answerWords = answers;
-        if (allowed && allowed.length) this.allowedWords = new Set(allowed.concat(this.answerWords));
-        // ensure at least have something
-        if (!this.answerWords.length) this.answerWords = (window.ANSWER_WORDS || ["APPLE"]).slice();
-        if (!this.allowedWords.size) this.allowedWords = new Set((window.ALLOWED_WORDS || this.answerWords));
-        // Persist to storage if loaded from files
-        this.saveDictionaryToStorage();
-      },
-      loadDictionaryFromStorage() {
-        try {
-          const a = localStorage.getItem('word-vue:answers');
-          const b = localStorage.getItem('word-vue:allowed');
-          if (a) {
-            const arr = JSON.parse(a);
-            if (Array.isArray(arr) && arr.length) this.answerWords = arr;
-          }
-          if (b) {
-            const arr = JSON.parse(b);
-            if (Array.isArray(arr) && arr.length) this.allowedWords = new Set(arr.concat(this.answerWords));
-          }
-        } catch(_) {}
-      },
-      saveDictionaryToStorage() {
-        try {
-          localStorage.setItem('word-vue:answers', JSON.stringify(this.answerWords));
-          localStorage.setItem('word-vue:allowed', JSON.stringify(Array.from(this.allowedWords)));
-        } catch(_) {}
-      },
       randomAnswer() {
         const list = this.answerWords && this.answerWords.length ? this.answerWords : (window.ANSWER_WORDS || ["APPLE"]);
         return list[Math.floor(Math.random() * list.length)];
       },
       newGame() {
-        if (!this.dictLoaded && (!this.answerWords || !this.answerWords.length)) return; // wait until dict is ready
         this.rows = makeEmptyRows();
         this.currentRow = 0;
         this.currentCol = 0;
