@@ -2,6 +2,8 @@
 
 Modern Wordle-style word game powered by Vue 3 and plain HTML/CSS/JS. Guess the five-letter word, track your stats, and play as many rounds as you like with a refreshed, rounded UI.
 
+![App preview](preview.png)
+
 ## Highlights
 
 - Vue 3 single-page app with flip animations and keyboard support
