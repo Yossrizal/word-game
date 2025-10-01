@@ -1,16 +1,16 @@
-# Word Vue
+# Word Game
 
-Modern Wordle-style word game powered by Vue 3 and plain HTML/CSS/JS. Guess the five-letter word, track your stats, and play as many rounds as you like with a refreshed, rounded UI.
+Modern five-letter word game built with plain HTML, CSS, and JavaScript. Guess the hidden word, track your stats, and dive into as many rounds as you like with a refreshed, rounded UI.
 
 ![App preview](preview.png)
 
 ## Highlights
 
-- Vue 3 single-page app with flip animations and keyboard support
+- Smooth single-page experience with flip animations and keyboard support
 - Unlimited games with instant “New Game”
 - Local statistics (played, win %, streaks, distribution)
 - Curated dark glassmorphism theme with accessible contrasts
-- Strict validation against a full 14 k+ Wordle dictionary loaded from text files
+- Strict validation against a full 14 k+ dictionary loaded from text files
 
 ## Prerequisites
 
@@ -32,7 +32,7 @@ npx serve .
 
 - Type on your keyboard or click the on-screen keys.
 - `Enter` submits, `Backspace` deletes.
-- Tile colors follow Wordle rules: green = exact match, yellow = letter exists elsewhere, dark = absent.
+- Tile colors follow classic word-game rules: green = exact match, yellow = letter exists elsewhere, dark = absent.
 - Click **New Game** anytime for a fresh word.
 
 ## Dictionaries & Customisation
@@ -42,16 +42,16 @@ Word lists live in the `dict/` folder:
 - `dict/answers.txt` — words the game chooses from
 - `dict/allowed.txt` — valid guesses (auto-merged with answers on load)
 
-Both files are bundled with the full Wordle dictionary (~14 855 entries). To use your own:
+Both files ship with a comprehensive five-letter English dictionary (~14 855 entries). To use your own:
 
 1. Replace either/both files with your word lists (one 5-letter word per line; case-insensitive).
-2. Refresh the browser — the Vue app re-fetches the files on startup.
+2. Refresh the browser — the app re-fetches the files on startup.
 
 If the files can’t be fetched (e.g. server misconfiguration), the app falls back to a tiny built-in list and shows a toast warning.
 
 ## Statistics
 
-- Stored in `localStorage` under `word-vue:stats`.
+- Stored in `localStorage` under `word-game:stats`.
 - Includes games played, win rate, current/max streak, and guess distribution.
 - Clearing browser storage (or using incognito) resets the stats.
 
@@ -60,14 +60,14 @@ If the files can’t be fetched (e.g. server misconfiguration), the app falls ba
 ```
 index.html   # single page entry point
 style.css    # theme and layout
-app.js       # Vue 3 application logic
+app.js       # game logic
 dict/        # answer & guess dictionaries (text files)
 ```
 
 ## Notes
 
 - No build step required; everything runs in the browser.
-- Network access is only needed for the Vue CDN and loading the local dictionary files.
+- Network access is only needed for the CDN script and loading the local dictionary files.
 - Feel free to tweak the theme in `style.css` to match your brand or colour palette.
 
 Happy guessing!

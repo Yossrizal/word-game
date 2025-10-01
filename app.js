@@ -6,7 +6,7 @@
   const FLIP_INTERVAL_MS = 260;
   const SHAKE_DURATION_MS = 600;
   const TOAST_DURATION_MS = 1600;
-  const STORAGE_KEY_STATS = "word-vue:stats";
+  const STORAGE_KEY_STATS = "word-game:stats";
   const ANSWERS_PATH = "dict/answers.txt";
   const ALLOWED_PATH = "dict/allowed.txt";
 
@@ -328,4 +328,3 @@
 
   app.mount("#app");
 })();
-
