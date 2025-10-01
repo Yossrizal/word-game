@@ -1,16 +1,16 @@
 # Word Game
 
-Modern five-letter word game built with plain HTML, CSS, and JavaScript. Guess the hidden word, track your stats, and dive into as many rounds as you like with a refreshed, rounded UI.
+Word Game keeps your five-letter reflexes sharp. It’s a browser-native build with plain HTML, CSS, and JavaScript—fast load, clean interactions, ready whenever the urge to decode hits.
 
 ![App preview](preview.png)
 
 ## Highlights
 
-- Smooth single-page experience with flip animations and keyboard support
-- Unlimited games with instant “New Game”
-- Local statistics (played, win %, streaks, distribution)
-- Curated dark glassmorphism theme with accessible contrasts
-- Strict validation against a full 14 k+ dictionary loaded from text files
+- Polished single-page flow with flip animations and full keyboard support
+- Unlimited streaks—restart instantly without breaking your momentum
+- Local stats do the bookkeeping (games played, win rate, streaks, distribution)
+- Glassmorphism-inspired theme tuned for contrast and night-friendly play
+- Validates every guess against a curated 14 k+ dictionary sourced from text files
 
 ## Prerequisites
 
@@ -18,7 +18,7 @@ Modern five-letter word game built with plain HTML, CSS, and JavaScript. Guess t
 
 ## Run Locally
 
-The app fetches dictionary files (`dict/*.txt`), so you must serve it from HTTP/HTTPS.
+The app fetches dictionary files (`dict/*.txt`), so it expects HTTP/HTTPS. Spin up a lightweight static server from the project root:
 
 ```bash
 # from repo root
@@ -30,10 +30,10 @@ npx serve .
 
 ## Gameplay
 
-- Type on your keyboard or click the on-screen keys.
-- `Enter` submits, `Backspace` deletes.
-- Tile colors follow classic word-game rules: green = exact match, yellow = letter exists elsewhere, dark = absent.
-- Click **New Game** anytime for a fresh word.
+- Type with your keyboard or tap the on-screen layout—both stay in sync
+- `Enter` submits, `Backspace` deletes, no surprises
+- Tile colors keep the logic transparent: green = exact spot, yellow = wrong spot, dark = not in the word
+- Hit **New Game** whenever you want a clean slate
 
 ## Dictionaries & Customisation
 
@@ -42,20 +42,20 @@ Word lists live in the `dict/` folder:
 - `dict/answers.txt` — words the game chooses from
 - `dict/allowed.txt` — valid guesses (auto-merged with answers on load)
 
-Both files ship with a comprehensive five-letter English dictionary (~14 855 entries). To use your own:
+Both files ship with a comprehensive five-letter English dictionary (~14 855 entries). To swap in your own vocabulary:
 
 1. Replace either/both files with your word lists (one 5-letter word per line; case-insensitive).
 2. Refresh the browser — the app re-fetches the files on startup.
 
-If the files can’t be fetched (e.g. server misconfiguration), the app falls back to a tiny built-in list and shows a toast warning.
+If the fetch fails (for example, the server blocks `.txt`), the app drops to a small built-in list and flags the issue with a toast.
 
 ## Statistics
 
-- Stored in `localStorage` under `word-game:stats`.
-- Includes games played, win rate, current/max streak, and guess distribution.
-- Clearing browser storage (or using incognito) resets the stats.
+- Stored in `localStorage` as `word-game:stats`
+- Tracks games played, win rate, current/max streak, and guess distribution
+- Clearing browser storage (or jumping into a private window) resets everything
 
-## Project Structure
+## Project Layout
 
 ```
 index.html   # single page entry point
@@ -64,10 +64,10 @@ app.js       # game logic
 dict/        # answer & guess dictionaries (text files)
 ```
 
-## Notes
+## Good to Know
 
-- No build step required; everything runs in the browser.
-- Network access is only needed for the CDN script and loading the local dictionary files.
-- Feel free to tweak the theme in `style.css` to match your brand or colour palette.
+- Zero build chain—open in a browser after serving the folder
+- Network access only touches the CDN script and local dictionary fetches
+- Theme tokens live in `style.css` if you want to dial in your own palette
 
 Happy guessing!
