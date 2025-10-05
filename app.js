@@ -16,6 +16,20 @@
     ["Z", "X", "C", "V", "B", "N", "M"],
   ];
 
+  const SHARE_SYMBOLS = {
+    correct: "🟩",
+    present: "🟨",
+    absent: "⬛",
+  };
+
+  const SHARE_DISTRIBUTION_FILLED = "🟦";
+  const SHARE_DISTRIBUTION_EMPTY = "▫️";
+
+  const GAME_URL =
+    typeof window !== "undefined"
+      ? `${window.location.origin}${window.location.pathname}`.replace(/index\.html$/, "")
+      : "https://example.com";
+
   function createEmptyRows() {
     return Array.from({ length: ROWS }, () =>
       Array.from({ length: COLS }, () => ({ letter: "", state: "", flip: false }))
@@ -79,11 +93,16 @@
         answerWords: [],
         allowedWords: new Set(),
         dictionaryLoaded: false,
+        shareGrid: [],
+        lastResult: null,
       };
     },
     computed: {
       winRate() {
         return this.stats.played ? Math.round((this.stats.wins / this.stats.played) * 100) : 0;
+      },
+      canShare() {
+        return !!this.lastResult || this.stats.played > 0;
       },
     },
     mounted() {
@@ -115,6 +134,7 @@
         this.revealingRow = -1;
         this.revealing = false;
         this.answer = this.pickRandomAnswer();
+        this.shareGrid = [];
       },
 
       pickRandomAnswer() {
@@ -207,6 +227,7 @@
         }
 
         const results = evaluateGuess(this.answer, guess);
+        this.shareGrid.push(this.buildShareRow(results));
         this.revealGuess(results, guess);
       },
 
@@ -282,6 +303,12 @@
 
         this.stats = summary;
         this.persistStats();
+        this.lastResult = {
+          win,
+          guessesUsed,
+          shareLines: [...this.shareGrid],
+          answer: this.answer,
+        };
       },
 
       restoreStats() {
@@ -322,6 +349,78 @@
         const max = Math.max(1, ...this.stats.distribution);
         const width = Math.round((value / max) * 100);
         return `${Math.max(12, width)}%`;
+      },
+
+      buildShareRow(results) {
+        return results.map((state) => SHARE_SYMBOLS[state] || SHARE_SYMBOLS.absent).join("");
+      },
+
+      buildShareText() {
+        const maxDistributionValue = Math.max(0, ...this.stats.distribution);
+        const distributionLines = this.stats.distribution.map((value, index) => {
+          const filledCount = value > 0 && maxDistributionValue > 0
+            ? Math.max(1, Math.round((value / maxDistributionValue) * 5))
+            : 0;
+          const emptyCount = 5 - filledCount;
+          const filledSquares = SHARE_DISTRIBUTION_FILLED.repeat(filledCount);
+          const emptySquares = SHARE_DISTRIBUTION_EMPTY.repeat(Math.max(0, emptyCount));
+          return `${index + 1}: ${filledSquares}${emptySquares} (${value})`;
+        });
+
+        if (this.lastResult) {
+          const { win, guessesUsed, shareLines, answer } = this.lastResult;
+          const attempts = win ? `${guessesUsed}/${ROWS}` : `X/${ROWS}`;
+          const lines = [`Word Game ${attempts}`, "", ...shareLines];
+          if (!win) lines.push("", `Answer: ${answer}`);
+          lines.push("", "Guess Distribution", ...distributionLines);
+          lines.push("", `Play: ${GAME_URL}`);
+          return lines.join("\n").trim();
+        }
+
+        if (this.stats.played === 0) return "";
+
+        return [
+          "Word Game Stats",
+          `Played: ${this.stats.played}`,
+          `Win %: ${this.winRate}`,
+          `Current Streak: ${this.stats.currentStreak}`,
+          `Max Streak: ${this.stats.maxStreak}`,
+          "",
+          "Guess Distribution",
+          ...distributionLines,
+          "",
+          `Play: ${GAME_URL}`,
+        ].join("\n").trim();
+      },
+
+      async shareStats() {
+        const text = this.buildShareText();
+        if (!text) {
+          this.toast("Play a game first to share stats");
+          return;
+        }
+
+        try {
+          if (typeof navigator !== "undefined" && navigator.share) {
+            await navigator.share({ text });
+            this.toast("Shared successfully");
+            return;
+          }
+        } catch (_) {
+          /* fall through to clipboard */
+        }
+
+        try {
+          if (typeof navigator !== "undefined" && navigator.clipboard) {
+            await navigator.clipboard.writeText(text);
+            this.toast("Stats copied to clipboard");
+            return;
+          }
+        } catch (_) {
+          /* fall through to fallback */
+        }
+
+        this.toast("Sharing isn't supported here");
       },
     },
   });

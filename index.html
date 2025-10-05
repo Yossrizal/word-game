@@ -82,6 +82,7 @@
           </div>
 
           <div class="modal-actions">
+            <button class="btn" :disabled="!canShare" @click="shareStats">Share</button>
             <button class="btn" @click="showStats = false">Close</button>
           </div>
         </div>

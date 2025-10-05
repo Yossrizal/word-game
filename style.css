@@ -81,6 +81,12 @@ body {
 
 .btn:active { transform: translateY(0); box-shadow: none; }
 
+.btn[disabled] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .game {
   width: min(92vw, 520px);
   padding: 22px;
@@ -248,7 +254,7 @@ body {
 .dist-bar { background: rgba(148, 163, 184, 0.18); border-radius: 999px; overflow: hidden; }
 .dist-fill { background: linear-gradient(135deg, rgba(56, 189, 248, 0.85), rgba(129, 140, 248, 0.88)); color: #0f172a; font-weight: 700; font-size: 11px; padding: 5px 10px; min-width: 36px; text-align: right; border-radius: 999px; }
 
-.modal-actions { display: flex; justify-content: flex-end; margin-top: 20px; }
+.modal-actions { display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px; }
 
 /* Responsive tweaks */
 @media (max-width: 640px) {
