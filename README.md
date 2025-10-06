@@ -49,6 +49,11 @@ Both files ship with a comprehensive five-letter English dictionary (~14 855 e
 
 If the fetch fails (for example, the server blocks `.txt`), the app drops to a small built-in list and flags the issue with a toast.
 
+### Word Detail API
+
+- Word definition lookups call `https://api.dictionaryapi.dev/api/v2/entries/en/{word}` (free Dictionary API).
+- The modal surfaces phonetics plus up to three meanings when the API responds; if the service returns a "No Definitions Found" object, the message is shown instead.
+
 ## Statistics
 
 - Stored in `localStorage` as `word-game:stats`
