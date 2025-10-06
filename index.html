@@ -47,6 +47,46 @@
 
       <div class="toast" v-if="message">{{ message }}</div>
 
+      <!-- Result Modal -->
+      <div class="modal-backdrop" v-if="showResultModal" @click.self="closeResultModal">
+        <div class="modal result-modal">
+          <h2>Round Complete</h2>
+          <p class="round-status" v-if="lastResult">
+            {{ lastResult.win ? "You guessed it!" : "Maybe next time." }}
+          </p>
+          <div class="result-answer" v-if="lastResult">
+            <span class="label">Answer</span>
+            <span class="word">{{ lastResult.answer }}</span>
+          </div>
+
+          <div class="dictionary-block" v-if="dictionaryEntry">
+            <div class="dictionary-header">
+              <div class="dictionary-word">{{ dictionaryEntry.word }}</div>
+              <div class="dictionary-phonetic" v-if="dictionaryEntry.phonetic">{{ dictionaryEntry.phonetic }}</div>
+            </div>
+            <div class="dictionary-meaning" v-for="(meaning, mIdx) in dictionaryEntry.meanings" :key="mIdx">
+              <div class="part-of-speech" v-if="meaning.partOfSpeech">{{ meaning.partOfSpeech }}</div>
+              <ul class="definitions">
+                <li v-for="(definition, dIdx) in meaning.definitions" :key="dIdx">
+                  <span>{{ definition.definition }}</span>
+                  <span class="example" v-if="definition.example">"{{ definition.example }}"</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <div class="dictionary-block" v-else-if="dictionaryError">
+            <p class="dictionary-error">{{ dictionaryError }}</p>
+          </div>
+
+          <div class="modal-actions result-actions">
+            <button class="btn" @click="fetchDictionary" :disabled="dictionaryLoading">
+              {{ dictionaryLoading ? "Loading..." : "Word Details" }}
+            </button>
+            <button class="btn" @click="newGame()">Play Again</button>
+            <button class="btn" @click="closeResultModal">Close</button>
+          </div>
+        </div>
+      </div>
 
       <!-- Stats Modal -->
       <div class="modal-backdrop" v-if="showStats" @click.self="showStats = false">

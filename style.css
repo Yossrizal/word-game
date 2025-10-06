@@ -256,6 +256,94 @@ body {
 
 .modal-actions { display: flex; justify-content: flex-end; margin-top: 20px; gap: 10px; }
 
+.result-modal .round-status {
+  margin: 4px 0 16px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.result-answer {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.result-answer .label {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.1px;
+  color: var(--muted);
+}
+
+.result-answer .word {
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 2px;
+}
+
+.dictionary-block {
+  background: rgba(56, 189, 248, 0.08);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 18px;
+}
+
+.dictionary-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+.dictionary-word {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+}
+
+.dictionary-phonetic {
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.dictionary-meaning + .dictionary-meaning { margin-top: 12px; }
+
+.dictionary-meaning .part-of-speech {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.definitions {
+  margin: 0;
+  padding-left: 16px;
+  display: grid;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--fg);
+}
+
+.definitions li { list-style: disc; }
+
+.definitions .example {
+  display: block;
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.dictionary-error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 14px;
+}
+
+.result-actions { justify-content: flex-start; }
+
 /* Responsive tweaks */
 @media (max-width: 640px) {
   /* Softer light palette for small screens */
@@ -401,6 +489,26 @@ body {
     border: 1px solid rgba(59, 130, 246, 0.2);
     box-shadow: none;
   }
+
+  .result-modal .round-status { font-size: 13px; }
+
+  .result-answer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .result-answer .word { font-size: 24px; }
+
+  .dictionary-block {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.2);
+  }
+
+  .dictionary-word { font-size: 20px; }
+  .dictionary-phonetic { font-size: 13px; }
+  .definitions { font-size: 13px; }
+  .definitions .example { font-size: 11px; }
 
   .dist-bar { background: rgba(226, 232, 240, 0.8); }
 

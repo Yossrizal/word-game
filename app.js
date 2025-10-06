@@ -89,12 +89,17 @@
         keyRows: KEY_LAYOUT,
         keyState: Object.create(null),
         showStats: false,
+        showResultModal: false,
         stats: createInitialStats(),
         answerWords: [],
         allowedWords: new Set(),
         dictionaryLoaded: false,
         shareGrid: [],
         lastResult: null,
+        dictionaryEntry: null,
+        dictionaryLoading: false,
+        dictionaryError: "",
+        dictionaryFetchedWord: "",
       };
     },
     computed: {
@@ -135,6 +140,11 @@
         this.revealing = false;
         this.answer = this.pickRandomAnswer();
         this.shareGrid = [];
+        this.showResultModal = false;
+        this.dictionaryEntry = null;
+        this.dictionaryError = "";
+        this.dictionaryLoading = false;
+        this.dictionaryFetchedWord = "";
       },
 
       pickRandomAnswer() {
@@ -309,6 +319,11 @@
           shareLines: [...this.shareGrid],
           answer: this.answer,
         };
+        this.showResultModal = true;
+        this.dictionaryEntry = null;
+        this.dictionaryError = "";
+        this.dictionaryLoading = false;
+        this.dictionaryFetchedWord = "";
       },
 
       restoreStats() {
@@ -342,6 +357,7 @@
 
       newGame() {
         if (!this.dictionaryLoaded && !this.answerWords.length) return;
+        this.showResultModal = false;
         this.startRound();
       },
 
@@ -421,6 +437,79 @@
         }
 
         this.toast("Sharing isn't supported here");
+      },
+
+      closeResultModal() {
+        this.showResultModal = false;
+      },
+
+      async fetchDictionary() {
+        if (!this.lastResult || !this.lastResult.answer) return;
+        const word = this.lastResult.answer.toLowerCase();
+        if (!word) return;
+        if (this.dictionaryLoading) return;
+        if (this.dictionaryEntry && this.dictionaryFetchedWord === word) return;
+
+        this.dictionaryLoading = true;
+        this.dictionaryError = "";
+
+        try {
+          const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+
+          let payload;
+          try {
+            payload = await response.json();
+          } catch (_) {
+            payload = null;
+          }
+
+          if (!response.ok) {
+            const message =
+              payload && !Array.isArray(payload) && typeof payload === "object"
+                ? payload.message || payload.title || payload.resolution
+                : "";
+            throw new Error(message || "Unable to find details for this word.");
+          }
+
+          const entry = Array.isArray(payload) && payload.length ? payload[0] : null;
+          if (!entry) throw new Error("No definitions found for this word.");
+
+          const phonetic = entry.phonetic
+            || (Array.isArray(entry.phonetics)
+              ? entry.phonetics.find((item) => typeof item?.text === "string")?.text
+              : "");
+
+          const meanings = Array.isArray(entry.meanings)
+            ? entry.meanings.slice(0, 3).map((meaning) => ({
+                partOfSpeech: meaning.partOfSpeech || "",
+                definitions: Array.isArray(meaning.definitions)
+                  ? meaning.definitions
+                      .filter((def) => def && typeof def.definition === "string")
+                      .slice(0, 3)
+                      .map((def) => ({
+                        definition: def.definition.trim(),
+                        example: typeof def.example === "string" ? def.example.trim() : "",
+                      }))
+                  : [],
+              }))
+            : [];
+
+          const hasDefinitions = meanings.some((meaning) => meaning.definitions.length > 0);
+          if (!hasDefinitions) throw new Error("No definitions found for this word.");
+
+          this.dictionaryEntry = {
+            word: entry.word || this.lastResult.answer,
+            phonetic: phonetic || "",
+            meanings,
+          };
+          this.dictionaryFetchedWord = word;
+        } catch (error) {
+          this.dictionaryError = error?.message || "Unable to find details for this word.";
+          this.dictionaryEntry = null;
+          this.dictionaryFetchedWord = "";
+        } finally {
+          this.dictionaryLoading = false;
+        }
       },
     },
   });
